@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+
+  local-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: database
+    ports:
+      - "5432:5432"
+
+# docker run -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_USER=root -e POSTGRES_DB=database -d postgres

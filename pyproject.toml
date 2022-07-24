@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "aiohttp_testwork"
+version = "0.0.0"
+description = ""
+authors = ["dr.Livsy <plumbus.rise@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "3.9.13"
+asyncio = "^3.4.3"
+aiohttp = "^3.7.3"
+asyncpg = "^0.24.0"
+pyyaml =  "6.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
