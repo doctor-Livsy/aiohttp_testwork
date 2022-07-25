@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import asyncio
 import asyncpg
+from asyncpg.exceptions import UniqueViolationError
 
 
 class Database:
@@ -54,18 +55,26 @@ class Database:
         async with self.connection_pool.acquire() as connection:
             await connection.execute(request)
 
-    async def check_user_exist(self, user_name: str):
+    async def get_user(self, user_name: str):
         request = f"SELECT * FROM users WHERE user_name=$1"
         return await self.connection_pool.fetchrow(request, user_name)
 
     async def add_user(self, user_name: str, password: str) -> bool:
         request = "INSERT INTO users(user_name, password) VALUES ($1, $2)"
         async with self.connection_pool.acquire() as connection:
-            user = await self.check_user_exist(user_name=user_name)
+            user = await self.get_user(user_name=user_name)
             if user is None:
                 await connection.execute(request, user_name, password)
                 return True
         return False
+
+    async def save_bytes_image(self, image_id: str, bytes_image: bytes) -> Tuple[bool, str]:
+        request = 'INSERT INTO images(image_id, image) VALUES ($1, $2)'
+        try:
+            await self.connection_pool.execute(request, image_id, bytes_image)
+            return True, ''
+        except UniqueViolationError as e:
+            return False, f'image_id: {image_id} already exist'
 
     async def run_database(self) -> None:
         self.connection_pool = await asyncpg.create_pool(
