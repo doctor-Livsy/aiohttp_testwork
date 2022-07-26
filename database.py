@@ -68,13 +68,19 @@ class Database:
                 return True
         return False
 
-    async def save_bytes_image(self, image_id: str, bytes_image: bytes) -> Tuple[bool, str]:
+    async def save_binary_image(self, image_id: str, binary_image: bytes) -> Tuple[bool, str]:
         request = 'INSERT INTO images(image_id, image) VALUES ($1, $2)'
         try:
-            await self.connection_pool.execute(request, image_id, bytes_image)
+            await self.connection_pool.execute(request, image_id, binary_image)
             return True, ''
-        except UniqueViolationError as e:
+        except UniqueViolationError:
             return False, f'image_id: {image_id} already exist'
+        except Exception as e:
+            raise e
+
+    async def get_binary_image(self, image_id: str):
+        request = f"SELECT * FROM images WHERE image_id=$1"
+        return await self.connection_pool.fetchrow(request, image_id)
 
     async def run_database(self) -> None:
         self.connection_pool = await asyncpg.create_pool(
